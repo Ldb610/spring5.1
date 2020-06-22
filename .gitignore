@@ -1,0 +1,80 @@
+*.java.hsp
+*.sonarj
+*.sw*
+.DS_Store
+.settings
+.springBeans
+bin
+build.sh
+integration-repo
+ivy-cache
+jxl.log
+jmx.log
+derby.log
+spring-test/test-output/
+.gradle
+argfile*
+pom.xml
+activemq-data/
+
+classes/
+/build
+buildSrc/build
+/spring-*/build
+/src/asciidoc/build
+target/
+out/
+# Eclipse artifacts, including WTP generated manifests
+.classpath
+.project
+spring-*/src/main/java/META-INF/MANIFEST.MF
+
+# IDEA artifacts and output dirs
+*.iml
+*.ipr
+*.iws
+.idea
+out
+test-output
+atlassian-ide-plugin.xml
+.gradletasknamecache
+
+
+	personBaseInfo.put("aac002",unemploymentJsonObject.get("aac002"));
+        personBaseInfo.put("aac003",unemploymentJsonObject.get("aac003"));
+        personBaseInfo.put("aac004",unemploymentJsonObject.get("aac004"));
+        personBaseInfo.put("aac005",unemploymentJsonObject.get("aac005"));
+        personBaseInfo.put("aac006",unemploymentJsonObject.get("aac006"));
+        personBaseInfo.put("aac007",unemploymentJsonObject.get("aac007"));
+        personBaseInfo.put("aac009",unemploymentJsonObject.get("aac009"));
+        personBaseInfo.put("aac011",unemploymentJsonObject.get("aac011"));
+        personBaseInfo.put("aac040",unemploymentJsonObject.get("aac040"));
+        personBaseInfo.put("aae035",unemploymentJsonObject.get("aae035"));
+        personBaseInfo.put("aac012",unemploymentJsonObject.get("aac012"));
+        personBaseInfo.put("aac014",unemploymentJsonObject.get("aac014"));
+        personBaseInfo.put("aae004",unemploymentJsonObject.get("aae004"));
+        personBaseInfo.put("aae005",unemploymentJsonObject.get("aae005"));
+        personBaseInfo.put("aae006",unemploymentJsonObject.get("aae006"));
+        personBaseInfo.put("aae007",unemploymentJsonObject.get("aae007"));
+
+
+sendData.put("aaz163","");	
+sendData.put("aae036","");
+sendData.put("bae501","");
+sendData.put("aae035","");
+sendData.put("aae160","");
+sendData.put("aae016","");
+sendData.put("bic001","");
+sendData.put("","");
+sendData.put("","");
+sendData.put("","");
+sendData.put("","");
+sendData.put("","");
+
+
+
+
+
+
+
+
