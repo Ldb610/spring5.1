@@ -528,6 +528,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
+				// lookupRes 完成了所谓的扫描（解析java对象，形成BeanDefinition），
+				//  这边是怎么包扫描的呢？是利用了ClassPathBeanDefinitionScanner
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.

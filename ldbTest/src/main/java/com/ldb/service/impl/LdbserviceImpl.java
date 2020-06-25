@@ -4,6 +4,7 @@ import com.ldb.dao.LdbDao;
 import com.ldb.dao.impl.LdbDaoImpl;
 import com.ldb.service.LdbService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**

@@ -162,6 +162,8 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		this.registry = registry;
 
+		// lookupres 默认是true 默认的就是使用 spring的几个扫描的注解，例如@Component，
+		//  其它的@Controller之类的都是因为注解里面加了@Component才能被扫描到的
 		if (useDefaultFilters) {
 			registerDefaultFilters();
 		}
@@ -250,6 +252,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	public int scan(String... basePackages) {
 		int beanCountAtScanStart = this.registry.getBeanDefinitionCount();
 
+		// lookupRes 开始执行扫描
 		doScan(basePackages);
 
 		// Register annotation config processors, if necessary.
@@ -272,6 +275,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
 		for (String basePackage : basePackages) {
+			// lookupres 在这句代码里面完成了扫描
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 			for (BeanDefinition candidate : candidates) {
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);

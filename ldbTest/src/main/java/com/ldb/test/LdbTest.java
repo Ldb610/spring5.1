@@ -28,7 +28,9 @@ public class LdbTest {
 	public static void main(String[] args) {
 //		AnnotationConfigApplicationContext ac =
 //				new AnnotationConfigApplicationContext();
-		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("classpath:spring.xml");
+		AnnotationConfigApplicationContext ac =
+				new AnnotationConfigApplicationContext(AppConfig.class);
+//		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("classpath:spring.xml");
 //		LdbDao ldbDao = (LdbDao) annotationConfigApplicationContext.getBean("ldbDaoImpl");
 //		LdbService ldbService = (LdbService) annotationConfigApplicationContext.getBean("ldbserviceImpl");
 //		ac.getEnvironment().setActiveProfiles("develop");

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
  * @Date: 2019/8/15 22:29
  * @Version: 1.0
  */
-//@Repository
+@Repository
 public class LdbDaoImpl implements LdbDao {
 	@Override
 	public void query() {

@@ -204,6 +204,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 */
 	@SuppressWarnings("unchecked")
 	protected void registerDefaultFilters() {
+		//  lookupres 这里加了个 Component.class，后续spring 扫描出来一个resource，要判断是否合理的时候用到了
 		this.includeFilters.add(new AnnotationTypeFilter(Component.class));
 		ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();
 		try {
@@ -309,10 +310,12 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @return a corresponding Set of autodetected bean definitions
 	 */
 	public Set<BeanDefinition> findCandidateComponents(String basePackage) {
+		// lookupres spring有个生成索引的jar包，如果加了那个jar包，启动速度会变快，但是编译速度变慢
 		if (this.componentsIndex != null && indexSupportsIncludeFilters()) {
 			return addCandidateComponentsFromIndex(this.componentsIndex, basePackage);
 		}
 		else {
+			// lookupres 开始扫描
 			return scanCandidateComponents(basePackage);
 		}
 	}
@@ -416,8 +419,12 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
 		try {
+			// lookupres 拼接路径 扫描出来以后 是个 classpath*:com/ldb/**/*.class,
+			//  其中classpath* 这个东西在我们做开发的时候很常见，这个就是spring 对Resource这个东西做了拓展，
+			//  可以直接看成 D://**目录/项目名/target/。。。这样的路径，spring 通过这个路径就能找到相应的class
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
+			//  lookupres 拿到了项目对应的class 的resource
 			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
@@ -427,11 +434,14 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 				}
 				if (resource.isReadable()) {
 					try {
+						// lookupres MetadataReader 可以看成我们对应的class的元数据，就是这个类对应的路径，注解，父类啥啥的信息它都有存
 						MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
+						// lookupres 判断当前这个文件符不符合我们的规则
 						if (isCandidateComponent(metadataReader)) {
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 							sbd.setResource(resource);
 							sbd.setSource(resource);
+							// lookupres mybatis 的@MapperScan 就是对这边进行了拓展
 							if (isCandidateComponent(sbd)) {
 								if (debugEnabled) {
 									logger.debug("Identified candidate component class: " + resource);
@@ -488,11 +498,15 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @return whether the class qualifies as a candidate component
 	 */
 	protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOException {
+		// lookupres 是否是被剔除的文件
 		for (TypeFilter tf : this.excludeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
 				return false;
 			}
 		}
+
+		// lookupres 是否是被包含的文件（能生成 java bean的类，例如有没有加 @Component），
+		//  这边有个疑问，什么时候加载的这个includeFilters
 		for (TypeFilter tf : this.includeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
 				return isConditionMatch(metadataReader);
@@ -525,6 +539,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 */
 	protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
 		AnnotationMetadata metadata = beanDefinition.getMetadata();
+		// lookupres 判断是不是独立的一个类、是不是一个接口或者抽象类、是不是一个加了@lookup的类
 		return (metadata.isIndependent() && (metadata.isConcrete() ||
 				(metadata.isAbstract() && metadata.hasAnnotatedMethods(Lookup.class.getName()))));
 	}

@@ -2,8 +2,6 @@ package com.ldb.dao.impl;
 
 import com.ldb.annotation.LdbScan;
 import com.ldb.dao.LdbDao;
-import com.ldb.entity.po.Ldb;
-import org.springframework.stereotype.Repository;
 
 /**
  * @ProjectName: spring
@@ -15,8 +13,8 @@ import org.springframework.stereotype.Repository;
  * @Version: 1.0
  */
 //@Repository
-@LdbScan
-public class LdbDaoImpl1 implements LdbDao {
+//@LdbScan
+public class LdbDaoImpl2 implements LdbDao {
 	LdbDao ldbDaoImpl;
 
 	public LdbDao getLdbDaoImpl() {
@@ -29,6 +27,6 @@ public class LdbDaoImpl1 implements LdbDao {
 
 	@Override
 	public void query() {
-		System.out.println("query1");
+		System.out.println("query2");
 	}
 }

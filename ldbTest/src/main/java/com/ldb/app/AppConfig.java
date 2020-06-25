@@ -2,6 +2,7 @@ package com.ldb.app;
 
 import com.ldb.entity.po.Ldb;
 import com.ldb.entity.po.LdbFactoryBean;
+import com.ldb.util.SpringContextHolder;
 import org.springframework.context.annotation.*;
 
 /**
@@ -19,7 +20,7 @@ public class AppConfig {
 
 
 	@Bean
-	@Profile("develop")
+//	@Profile("develop")
 	@Scope("singleton")
 	public Ldb getLdb(){
 		return new Ldb();
@@ -31,5 +32,10 @@ public class AppConfig {
 	}
 
 
+	@Bean
+	@Scope("singleton")
+	public SpringContextHolder springContextHolder(){
+		return new SpringContextHolder();
+	}
 
 }

@@ -1,7 +1,11 @@
-package com.ldb.service.impl;
+package com.ldb.util;
 
+import com.ldb.app.LdbConfig;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.context.annotation.AnnotatedBeanDefinitionReader;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -19,9 +23,11 @@ public class SmartLifecycleTest implements SmartLifecycle {
 	@Override
 	public void start() {
 		System.out.println("启动了");
-		AnnotationConfigApplicationContext ac =
-				new AnnotationConfigApplicationContext();
-		ConfigurableListableBeanFactory beanFactory = ac.getBeanFactory();
+		AnnotationConfigApplicationContext ac = (AnnotationConfigApplicationContext) SpringContextHolder.getApplicationContext();
+		System.out.println(ac.getBean("getLdb"));
+		System.out.println(ac.getBean("ldbDaoImpl"));
+		AnnotatedBeanDefinitionReader abd = new AnnotatedBeanDefinitionReader(ac);
+		abd.registerBean(LdbConfig.class);
 
 	}
 

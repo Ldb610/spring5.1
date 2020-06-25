@@ -63,7 +63,17 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext() {
 		//获取读取器
+		// lookupRes 这行代码的作用就是把一个类变成 BeanDefinition。
+		//  那么为啥是AnnotatedBeanDefinition 这个的reader呢？
+		//  原因在于AnnotatedBeanDefinition是用来加载配置类的。
+		//  就像AppConfig.class,其它的像包扫描之类的都是在这个类里面加注解之类里面实现的，
+		//  如果一开始不先加载这个类，那么整个的spring将无法正常工作。
+		//  这只是其中一点，但是这个AnnotatedBeanDefinitionReader
+		//  最重要的一点是如果非spring 开发人员要拓展spring的时候，
+		//  可以调用AnnotatedBeanDefinitionReader进行spring bean的注入
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+
+		// lookupRes spring 用来实现包扫描的方法，这边对它进行了初始化
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
@@ -168,6 +178,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public void scan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
+		// lookupRes 利用了ClassPathBeanDefinitionScanner 进行了包扫描
 		this.scanner.scan(basePackages);
 	}
 
