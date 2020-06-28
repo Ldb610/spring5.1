@@ -11,19 +11,19 @@ import org.springframework.beans.factory.FactoryBean;
  * @Date: 2019/8/16 23:19
  * @Version: 1.0
  */
-public class LdbFactoryBean implements FactoryBean {
-	@Override
-	public Object getObject() throws Exception {
-		return new Ldb();
-	}
-
-	@Override
-	public Class<?> getObjectType() {
-		return Ldb.class;
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
+public class LdbFactoryBean {
+//	@Override
+//	public Object getObject() throws Exception {
+//		return new Ldb();
+//	}
+//
+//	@Override
+//	public Class<?> getObjectType() {
+//		return Ldb.class;
+//	}
+//
+//	@Override
+//	public boolean isSingleton() {
+//		return true;
+//	}
 }

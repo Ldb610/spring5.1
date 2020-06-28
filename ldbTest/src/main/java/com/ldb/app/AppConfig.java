@@ -16,6 +16,7 @@ import org.springframework.context.annotation.*;
  */
 @Configuration
 @ComponentScan("com.ldb")
+@EnableAspectJAutoProxy
 public class AppConfig {
 
 

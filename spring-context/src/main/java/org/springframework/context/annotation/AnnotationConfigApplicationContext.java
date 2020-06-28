@@ -73,7 +73,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		//  可以调用AnnotatedBeanDefinitionReader进行spring bean的注入
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 
-		// lookupRes spring 用来实现包扫描的方法，这边对它进行了初始化
+		// lookupRes 给外部程序员使用的，用来实现包扫描的方法，这边对它进行了初始化，spring 内部重新实例化了一个
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 

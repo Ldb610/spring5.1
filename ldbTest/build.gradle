@@ -13,5 +13,13 @@ repositories {
 
 dependencies {
     compile project(':spring-context')
+    compile project(':spring-context-support')
+    compile project(':spring-aop')
+    compile project(':spring-aspects')
+    compile project(':spring-tx')
+    compile project(':spring-jdbc')
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    // https://mvnrepository.com/artifact/org.aspectj/aspectjrt
+//    compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.5'
 }
