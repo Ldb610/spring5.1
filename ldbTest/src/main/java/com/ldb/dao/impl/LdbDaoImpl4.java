@@ -16,7 +16,7 @@ import org.springframework.context.ApplicationContext;
  * @Version: 1.0
  */
 //@Repository
-@LdbScan
+//@LdbScan
 public class LdbDaoImpl4 extends LdbDaoImpl3{
 
 	@Override

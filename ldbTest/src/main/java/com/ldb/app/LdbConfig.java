@@ -13,11 +13,11 @@ import org.springframework.context.annotation.Configuration;
  * @Date: 2020/6/26 2:36
  * @Version: 1.0
  */
-@Configuration
+//@Configuration
 public class LdbConfig {
 
-	@Bean
-	public LdbDaoImpl2 ldbDaoImpl2(){
-		return new LdbDaoImpl2();
-	}
+//	@Bean
+//	public LdbDaoImpl2 ldbDaoImpl2(){
+//		return new LdbDaoImpl2();
+//	}
 }

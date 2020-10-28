@@ -176,6 +176,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		Object singletonObject = this.singletonObjects.get(beanName);
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+			// lookupres 这个为什么需要加锁呢？
+			//  因为这个是单例的，那么这个获取到的对象肯定都需要是同一个，但是如果有同时多个人来获取bean的话，
+			//  那么就可能会出现A线程正在实例化这个bean，但是还没实例化完成，
+			//  但是B线程这个时候也过来获取这个bean了，那么这时候两个线程都会产生一个bean。这样就会导致系统出问题
 			synchronized (this.singletonObjects) {
 				singletonObject = this.earlySingletonObjects.get(beanName);
 				if (singletonObject == null && allowEarlyReference) {

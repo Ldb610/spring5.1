@@ -488,6 +488,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * lookupres 返回将应用到内部BeanFactory的BeanFactoryPostProcessors列表。
 	 * Return the list of BeanFactoryPostProcessors that will get applied
 	 * to the internal BeanFactory.
 	 */
@@ -518,6 +519,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			// lookupres 没啥用后面看
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
@@ -530,9 +532,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Invoke factory processors registered as beans in the context.
 				// lookupRes 完成了所谓的扫描（解析java对象，形成BeanDefinition），
 				//  这边是怎么包扫描的呢？是利用了ClassPathBeanDefinitionScanner
+				// lookupres 这步之前的操作有个意义是，如果这个beanFactory是个空的，
+				//  如果上面的那几步会给他生成一个beanFactory。
+				//  但是什么时候进来到这步的时候beanFactory 可能会是空的呢如果是通过AnnotationConfigApplicationContext
+				//  初始化的spring这一步的beanFactory不可能是空的，因为AnnotationConfigApplicationContext
+				//  初始化的时候会new一个DefaultListableBeanFactory
 				invokeBeanFactoryPostProcessors(beanFactory);
-
+				System.out.println("扫描结束");
 				// Register bean processors that intercept bean creation.
+				// lookupres 包扫描结束后把bean后置处理器注册到 beanFactory
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -598,13 +606,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
+		// lookupres 主要是提供给子类使用，用来加载配置 例如jvm -d 的配置，@PropertySources的配置
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
+		// lookupres 检测必填参数校验
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...
+		// lookupres 存储一些初始化监听
 		if (this.earlyApplicationListeners == null) {
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}
@@ -640,6 +651,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * lookupres 准备bean工厂
 	 * Configure the factory's standard context characteristics,
 	 * such as the context's ClassLoader and post-processors.
 	 * @param beanFactory the BeanFactory to configure
@@ -704,6 +716,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before singleton instantiation.
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		// lookupres  getBeanFactoryPostProcessors() 这个获取的是程序员自己继承BeanDefinitionRegistryPostProcessor 这个父类才会被扫描出来
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
@@ -876,6 +889,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
+		// lookupres 实例化单例的buean
 		beanFactory.preInstantiateSingletons();
 	}
 

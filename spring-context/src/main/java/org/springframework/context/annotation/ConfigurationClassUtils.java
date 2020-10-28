@@ -74,6 +74,7 @@ abstract class ConfigurationClassUtils {
 	 * Check whether the given bean definition is a candidate for a configuration class
 	 * (or a nested component class declared within a configuration/component class,
 	 * to be auto-registered as well), and mark it accordingly.
+	 * lookupres 检查给定的bean定义是否是配置类(或在配置/组件类中声明的嵌套组件类，也要自动注册)的候选类，并相应地对其进行标记。
 	 * @param beanDef the bean definition to check
 	 * @param metadataReaderFactory the current factory in use by the caller
 	 * @return whether the candidate qualifies as (any kind of) configuration class
@@ -86,8 +87,14 @@ abstract class ConfigurationClassUtils {
 			return false;
 		}
 
+		// lookupres AnnotationMetadata里面有类的注解和类的类型
 		AnnotationMetadata metadata;
+		// lookupres 找到对应的 AnnotatedBeanDefinition，这句代码也说明了
+		//  AnnotatedGenericBeanDefinition（初始化的配置类AppConfig.class），ConfigurationClassBeanDefinition（@Bean），
+		//  ScannedGenericBeanDefinition（@Component）都可以当作配置类使用，
+		//  这个的意思就是即使注册一个@Component 也能当成配置类来用，当然spring没这么做，但是理论上是可以这么做的。
 		if (beanDef instanceof AnnotatedBeanDefinition &&
+				//  lookupres 这个不能是个内部类
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
 			// Can reuse the pre-parsed metadata from the given BeanDefinition...
 			metadata = ((AnnotatedBeanDefinition) beanDef).getMetadata();
@@ -112,9 +119,12 @@ abstract class ConfigurationClassUtils {
 			}
 		}
 
+		// lookupres 检查给定的元数据以获得完整的配置类候选，就是他是不是全配置类
 		if (isFullConfigurationCandidate(metadata)) {
+			// lookupRes 如果是全配置类，加上full
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
+		// lookupres 是否含有@Component @ComponentScan @Import @ImportResource @Bean 是否是接口
 		else if (isLiteConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
@@ -123,6 +133,7 @@ abstract class ConfigurationClassUtils {
 		}
 
 		// It's a full or lite configuration candidate... Let's determine the order value, if any.
+		// 它是一个full的或lite配置候选…我们来确定它的阶值，如果有的话。
 		Integer order = getOrder(metadata);
 		if (order != null) {
 			beanDef.setAttribute(ORDER_ATTRIBUTE, order);
@@ -150,6 +161,7 @@ abstract class ConfigurationClassUtils {
 	 * configuration class, including cross-method call interception
 	 */
 	public static boolean isFullConfigurationCandidate(AnnotationMetadata metadata) {
+		// lookupres 如果有@Configuration 就是全配置类
 		return metadata.isAnnotated(Configuration.class.getName());
 	}
 
@@ -162,12 +174,14 @@ abstract class ConfigurationClassUtils {
 	 * configuration class, just registering it and scanning it for {@code @Bean} methods
 	 */
 	public static boolean isLiteConfigurationCandidate(AnnotationMetadata metadata) {
-		// Do not consider an interface or an annotation...
+		// Do not consider an interface or an annotation..
+		// lookupres 如果是接口话，那他就不是非全配置类.
 		if (metadata.isInterface()) {
 			return false;
 		}
 
 		// Any of the typical annotations found?
+		// lookupres 是否含有@Component @ComponentScan @Import @ImportResource
 		for (String indicator : candidateIndicators) {
 			if (metadata.isAnnotated(indicator)) {
 				return true;
@@ -175,6 +189,7 @@ abstract class ConfigurationClassUtils {
 		}
 
 		// Finally, let's look for @Bean methods...
+		// lookupres 是否有@Bean
 		try {
 			return metadata.hasAnnotatedMethods(Bean.class.getName());
 		}
@@ -191,6 +206,8 @@ abstract class ConfigurationClassUtils {
 	 * class, through checking {@link #checkConfigurationClassCandidate}'s metadata marker.
 	 */
 	public static boolean isFullConfigurationClass(BeanDefinition beanDef) {
+		// lookupres beanDef.getAttribute是去 AttributeAccessorSupport 里面获取到 attributes，
+		//  如果被解析过了可以根据map.get("****.configurationClass") 获取到一个值 full
 		return CONFIGURATION_CLASS_FULL.equals(beanDef.getAttribute(CONFIGURATION_CLASS_ATTRIBUTE));
 	}
 
@@ -199,6 +216,8 @@ abstract class ConfigurationClassUtils {
 	 * class, through checking {@link #checkConfigurationClassCandidate}'s metadata marker.
 	 */
 	public static boolean isLiteConfigurationClass(BeanDefinition beanDef) {
+		// lookupres beanDef.getAttribute是去 AttributeAccessorSupport 里面获取到 attributes，
+		//  如果被解析过了可以根据map.get("****.configurationClass") 获取到一个值 Lite
 		return CONFIGURATION_CLASS_LITE.equals(beanDef.getAttribute(CONFIGURATION_CLASS_ATTRIBUTE));
 	}
 

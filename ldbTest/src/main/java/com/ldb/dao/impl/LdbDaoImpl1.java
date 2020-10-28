@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
  * @Version: 1.0
  */
 //@Repository
-@LdbScan
+//@LdbScan
 public class LdbDaoImpl1 implements LdbDao {
 	LdbDao ldbDaoImpl;
 

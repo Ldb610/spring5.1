@@ -49,6 +49,7 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @author Sam Brannen
  * @since 3.1
+ * lookupres @ComponentScan 的解析器
  * @see ClassPathBeanDefinitionScanner#scan(String...)
  * @see ComponentScanBeanDefinitionParser
  */
@@ -74,7 +75,13 @@ class ComponentScanAnnotationParser {
 
 
 	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, final String declaringClass) {
+
+		// lookupres 这一行就是说明了，spring内部使用的扫描器和提供给外部的扫描器不是同一个
 		ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this.registry,
+				// lookupres 这个 useDefaultFilters 是可以进行配置的，@Component 上面有这个属性，可以配置不使用，
+				//  那这个内部的 scanner 其实主要应该是说spring内部的scanner可以让程序员来配置，让程序员自己决定用不用，
+				//  但是我提供个程序员的一定要强约束，不让程序员乱改。但是外部提供的 scanner 程序员是可以对它进行拓展的，
+				//  但是不能在我这个scanner里面乱改，防止出问题
 				componentScan.getBoolean("useDefaultFilters"), this.environment, this.resourceLoader);
 
 		Class<? extends BeanNameGenerator> generatorClass = componentScan.getClass("nameGenerator");
@@ -93,17 +100,20 @@ class ComponentScanAnnotationParser {
 
 		scanner.setResourcePattern(componentScan.getString("resourcePattern"));
 
+		// lookupres 包扫描，哪些class要被引入进来
 		for (AnnotationAttributes filter : componentScan.getAnnotationArray("includeFilters")) {
 			for (TypeFilter typeFilter : typeFiltersFor(filter)) {
 				scanner.addIncludeFilter(typeFilter);
 			}
 		}
+		// lookupres 包扫描，哪些class要被排除
 		for (AnnotationAttributes filter : componentScan.getAnnotationArray("excludeFilters")) {
 			for (TypeFilter typeFilter : typeFiltersFor(filter)) {
 				scanner.addExcludeFilter(typeFilter);
 			}
 		}
 
+		// lookupres 是否懒加载
 		boolean lazyInit = componentScan.getBoolean("lazyInit");
 		if (lazyInit) {
 			scanner.getBeanDefinitionDefaults().setLazyInit(true);

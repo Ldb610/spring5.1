@@ -5,6 +5,7 @@ import com.ldb.app.LdbConfig;
 import com.ldb.dao.LdbDao;
 import com.ldb.dao.impl.LdbDaoImpl1;
 import com.ldb.entity.po.Ldb;
+import com.ldb.service.impl.LdbserviceImpl;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -45,5 +46,9 @@ public class BeanDefinitionTest {
 		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("classpath:spring.xml");
 		BeanDefinition ldbserviceImplBD = ac.getBeanFactory().getBeanDefinition("ldbserviceImpl");
 		System.out.println(ldbserviceImplBD.getClass().getSimpleName());
+		LdbserviceImpl ldbserviceImpl = (LdbserviceImpl)ac.getBean("ldbserviceImpl");
+//		Object ldbDaoImpl2 = ac.getBean("ldbDaoImpl2");
+//		System.out.println(ldbDaoImpl2);
+		ldbserviceImpl.queryService();
 	}
 }

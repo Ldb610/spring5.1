@@ -5,10 +5,10 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd"
 	   default-autowire="byType">
 
-<!--	<context:component-scan base-package="com.ldb"/>-->
-	<bean id="ldbDaoImpl" class="com.ldb.dao.impl.LdbDaoImpl" autowire-candidate="true">
+	<context:component-scan base-package="com.ldb"/>
+	<bean id="ldbDaoImpl" class="com.ldb.dao.impl.LdbDaoImpl" autowire-candidate="false">
 	</bean>
-	<bean id="ldbserviceImpl" class="com.ldb.service.impl.LdbserviceImpl" autowire-candidate="true">
-		<constructor-arg name="ldbDaoImpl" ref="ldbDaoImpl"/>
-	</bean>
+<!--	<bean id="ldbserviceImpl" class="com.ldb.service.impl.LdbserviceImpl" autowire-candidate="true">-->
+<!--		<constructor-arg name="ldbDaoImpl" ref="ldbDaoImpl"/>-->
+<!--	</bean>-->
 </beans>

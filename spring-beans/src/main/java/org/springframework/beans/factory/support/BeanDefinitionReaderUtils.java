@@ -163,6 +163,8 @@ public abstract class BeanDefinitionReaderUtils {
 
 		// Register bean definition under primary name.
 		String beanName = definitionHolder.getBeanName();
+		// lookupres 	this.beanDefinitionMap.put(beanName, beanDefinition);
+		//				this.beanDefinitionNames.add(beanName);
 		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
 
 		// Register aliases for bean name, if any.

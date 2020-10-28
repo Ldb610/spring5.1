@@ -52,21 +52,35 @@ final class PostProcessorRegistrationDelegate {
 	}
 
 
+	/**
+	 * lookupres 这个方法主要做了两件事情:
+	 * 	1、执行beanDefinitionRegistryPostProcessor --> postProcessBeanDefinitionRegistry
+	 * 	2、执行BeanDefinitionPostProcessor --> postProcessBeanFactory
+	 * @param beanFactory
+	 * @param beanFactoryPostProcessors
+	 */
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
 		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
 		Set<String> processedBeans = new HashSet<>();
 
+		// lookupres 如果是通过ClassPathXmlApplicationContext、AnnotationConfigApplicationContext来初始化 spring的，
+		//  那么BeanFactory是DefaultListableBeanFactory
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+			// lookupres 存放BeanFactory后置处理器
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
+			// lookupres 存放BeanDefinitionRegistry后置处理器
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
+					// lookupres 做了个向下转型
 					BeanDefinitionRegistryPostProcessor registryProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
+					// lookupres 然后去执行BeanDefinitionRegistryPostProcessor 的 postProcessBeanDefinitionRegistry方法，
+					//  也就是我们包扫描的第一步
 					registryProcessor.postProcessBeanDefinitionRegistry(registry);
 					registryProcessors.add(registryProcessor);
 				}
@@ -79,25 +93,42 @@ final class PostProcessorRegistrationDelegate {
 			// uninitialized to let the bean factory post-processors apply to them!
 			// Separate between BeanDefinitionRegistryPostProcessors that implement
 			// PriorityOrdered, Ordered, and the rest.
+			// lookupres 这个存的是当前要执行的BeanDefinitionRegistryPostProcessor
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
+			// 首先，调用实现PriorityOrdered的beandefinitionregistrypostprocessor。
+			// lookupRes 根据类型从dbmap中找到名字。
+			//  这边只能找到一个，为什么是一个呢？哪里来的呢？有什么用？
+			//  这个的名字叫 internalConfigurationAnnotationProcessor（这个很重要，对应的是ConfigurationClassPostProcessor这个class）
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
+				// lookupres PriorityOrdered.class 为什么要判断这个，有什么意义？
+				//  判断是不是优先执行的 BeanDefinitionRegistryPostProcessor（如果有PriorityOrdered.class 这个注解的class会被优先执行）
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
+					// lookupRes 存的是当前要执行的类有哪些，这个如果执行完了之后会清空 （里面只有一个类：ConfigurationClassPostProcessor）
+					// lookupRes beanFactory.getBean 1、直接从容器里面拿 2、如果容器中没有，但是BeanDefinitaionMap里面有，那就会去new一个
+					// lookupRes spring 在扫描的时候会调用 BeanDefinitionRegistryPostProcessor 这个接口，
+					//  而这个接口唯一的实现类就是ConfigurationClassPostProcessor 所以spring初始化的时候一定会实例化这个类，不然扫描没办法进行
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
+					// lookupRes 我找到的类有哪些(存放的是名字)，这个即使执行完了之后也不会清空（这个是用来防止类的重复调用）
 					processedBeans.add(ppName);
 				}
 			}
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
+			// lookupRes 我找到的类有哪些(存放的是对象)，这个即使执行完了之后也不会清空（这个是用来防止类的重复调用）
 			registryProcessors.addAll(currentRegistryProcessors);
+			// lookupres 这一步对spring进行了类的扫描
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
+			// lookupres 情况当前需要执行的Beandefinition（因为已经执行完了）
 			currentRegistryProcessors.clear();
 
 			// Next, invoke the BeanDefinitionRegistryPostProcessors that implement Ordered.
 			postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
+				// lookupres processedBeans.contains(ppName)这句话 体现了上文中processedBeans.add(ppName);的作用，
+				//  这个是用来控制一个类在这个过程中只会被执行一遍
 				if (!processedBeans.contains(ppName) && beanFactory.isTypeMatch(ppName, Ordered.class)) {
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
 					processedBeans.add(ppName);
@@ -105,6 +136,7 @@ final class PostProcessorRegistrationDelegate {
 			}
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
 			registryProcessors.addAll(currentRegistryProcessors);
+			// lookupres 执行 BeanDefinitionRegistryPostProcessor --> postProcessBeanDefinitionRegistry
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
 
@@ -127,7 +159,9 @@ final class PostProcessorRegistrationDelegate {
 			}
 
 			// Now, invoke the postProcessBeanFactory callback of all processors handled so far.
+			// lookupres 开始执行BeanFactoryPostProcessor的postProcessBeanFactory
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
+			// lookupres 开始执行BeanFactoryPostProcessor的postProcessBeanFactory
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
 		}
 
@@ -188,12 +222,15 @@ final class PostProcessorRegistrationDelegate {
 	public static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 
+		// lookupres 获取所有的 BeanPostProcessor
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		// Register BeanPostProcessorChecker that logs an info message when
 		// a bean is created during BeanPostProcessor instantiation, i.e. when
 		// a bean is not eligible for getting processed by all BeanPostProcessors.
 		int beanProcessorTargetCount = beanFactory.getBeanPostProcessorCount() + 1 + postProcessorNames.length;
+
+		//  lookupres 把 BeanPostProcessor 都加到bean工厂中
 		beanFactory.addBeanPostProcessor(new BeanPostProcessorChecker(beanFactory, beanProcessorTargetCount));
 
 		// Separate between BeanPostProcessors that implement PriorityOrdered,
@@ -202,6 +239,7 @@ final class PostProcessorRegistrationDelegate {
 		List<BeanPostProcessor> internalPostProcessors = new ArrayList<>();
 		List<String> orderedPostProcessorNames = new ArrayList<>();
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
+		// lookupres 把对应的beanPostProcessors 加到对应的里面
 		for (String ppName : postProcessorNames) {
 			if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 				BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -220,6 +258,8 @@ final class PostProcessorRegistrationDelegate {
 
 		// First, register the BeanPostProcessors that implement PriorityOrdered.
 		sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
+
+		// lookupres 把 BeanPostProcessor 都加到bean工厂中
 		registerBeanPostProcessors(beanFactory, priorityOrderedPostProcessors);
 
 		// Next, register the BeanPostProcessors that implement Ordered.
@@ -232,6 +272,8 @@ final class PostProcessorRegistrationDelegate {
 			}
 		}
 		sortPostProcessors(orderedPostProcessors, beanFactory);
+
+		// lookupres 把 BeanPostProcessor 都加到bean工厂中
 		registerBeanPostProcessors(beanFactory, orderedPostProcessors);
 
 		// Now, register all regular BeanPostProcessors.
@@ -247,10 +289,14 @@ final class PostProcessorRegistrationDelegate {
 
 		// Finally, re-register all internal BeanPostProcessors.
 		sortPostProcessors(internalPostProcessors, beanFactory);
+
+		// lookupres 把 BeanPostProcessor 都加到bean工厂中
 		registerBeanPostProcessors(beanFactory, internalPostProcessors);
 
 		// Re-register post-processor for detecting inner beans as ApplicationListeners,
 		// moving it to the end of the processor chain (for picking up proxies etc).
+
+		// lookupres 把 BeanPostProcessor 都加到bean工厂中
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
 	}
 
@@ -271,6 +317,7 @@ final class PostProcessorRegistrationDelegate {
 	private static void invokeBeanDefinitionRegistryPostProcessors(
 			Collection<? extends BeanDefinitionRegistryPostProcessor> postProcessors, BeanDefinitionRegistry registry) {
 
+		// lookupres 循环去遍历需要执行的BeanDefinitionRegistryPostProcessor
 		for (BeanDefinitionRegistryPostProcessor postProcessor : postProcessors) {
 			postProcessor.postProcessBeanDefinitionRegistry(registry);
 		}

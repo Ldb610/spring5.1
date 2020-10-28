@@ -216,6 +216,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	/**
 	 * Derive further bean definitions from the configuration classes in the registry.
 	 */
+	// lookupres 在这个方法里面完成了扫描
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 		int registryId = System.identityHashCode(registry);
@@ -229,6 +230,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 		this.registriesPostProcessed.add(registryId);
 
+		// lookupres 真正做起了扫描
 		processConfigBeanDefinitions(registry);
 	}
 
@@ -260,17 +262,35 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
+
+		// lookupres 从BeanFactory获取 所有的内置bd的名称（开天辟地的那5个+我们注册的AppConfig.class）
 		String[] candidateNames = registry.getBeanDefinitionNames();
 
 		for (String beanName : candidateNames) {
+			// lookupres 根据bd的名称获取对应的bd，联系上下文可以知道这个是判断一个类是不是被解析了。
+			//  那为什么要判断一个类是否已经被解析了，因为一个类如果已经被解析过了，那么它就没必要在被解析了（那一个类被解析之后存放在哪里呢？）。
+			//  可以想象成如果你有了一本书，同样的书给你只会占用你的空间，对你来说并没有什么用。
+			//  那么所谓的解析是什么呢？所谓的解析指的就是解析他里面的配置，例如@ComponentScan或者 @Bean之类的配置。
+			//  那spring的作者为什么做这一步呢？其实也就是为了解析配置类。
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
+
+			// lookupRes 是不是全配置类,判断了是不是被解析过了，如果被扫描到的bean
+			//  上面有@Configure那么他就是个full，否则是个lite
 			if (ConfigurationClassUtils.isFullConfigurationClass(beanDef) ||
 					ConfigurationClassUtils.isLiteConfigurationClass(beanDef)) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Bean definition has already been processed as a configuration class: " + beanDef);
 				}
 			}
+			// lookupres 那他又是怎么知道这个是个配置类的呢？其实是因为BeanDefinition的类型，其实就是根据这句话找出来的，
+			//  这句话可以找到对应的AnnotationBeanDefinition的bd，并对其进行解析，而我们传进来的AppConfig.class为啥是
+			//  AnnotationBeanDefinition的bd呢？因为在spring初始化的时候在register方法里面,调用了reader（AnnotatedBeanDefinitionReader）
+			//  的api把AppConfig.class注册成一个AnnotationGenericBeanDefinition的bd，
+			//  而这个bd又继承了AnnotationBeanDefinition的bd，所以AppConfig.class 直接就是个 AnnotationBeanDefinition。
+			//  这边补充点知识：如果使用AnnotationConfigApplicationContext初始化的spring才是生成的是AnnotationBeanDefinition。
+			//  那如果是使用ClassPathXmlApplicationContext初始化spring的呢？这个是怎么操作的，这个待验证。（应该是个ConfigGenericBeanDefinition）
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
+				// lookupres 只有appConfig.class 能通过校验
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
 			}
 		}
@@ -300,11 +320,13 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			}
 		}
 
+		// lookupres 如果没有指定的环境，就用默认的环境
 		if (this.environment == null) {
 			this.environment = new StandardEnvironment();
 		}
 
 		// Parse each @Configuration class
+		// lookupres 在这边spring 初始化 @ComponentScan 的解析器，为后面的包扫描做好事先准备
 		ConfigurationClassParser parser = new ConfigurationClassParser(
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
@@ -312,6 +334,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
+			// lookupres 解析类里面的注解
 			parser.parse(candidates);
 			parser.validate();
 

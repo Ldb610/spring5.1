@@ -14,9 +14,10 @@ import org.springframework.context.annotation.*;
  * @Date: 2019/8/15 22:18
  * @Version: 1.0
  */
-@Configuration
+//@Configuration
 @ComponentScan("com.ldb")
 @EnableAspectJAutoProxy
+@Import(LdbConfig.class)
 public class AppConfig {
 
 

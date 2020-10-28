@@ -4,6 +4,7 @@ import com.ldb.dao.LdbDao;
 import com.ldb.dao.impl.LdbDaoImpl;
 import com.ldb.service.LdbService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +24,18 @@ public class LdbserviceImpl implements LdbService {
 	 * 这个时候注入的是 LdbDaoImpl 这个实现类
 	 * @param ldbDaoImpl
 	 */
-	public LdbserviceImpl(LdbDao ldbDaoImpl) {
+//	public LdbserviceImpl(LdbDao ldbDaoImpl) {
+//		this.ldbDaoImpl = ldbDaoImpl;
+//	}
+
+	private LdbDao ldbDaoImpl;
+
+	public void setLdbDaoImpl(LdbDao ldbDaoImpl) {
 		this.ldbDaoImpl = ldbDaoImpl;
 	}
 
 	//	@Autowired
-	private LdbDao ldbDaoImpl;
+//	private LdbDao ldbDaoImpl;
 	@Override
 	public void queryService() {
 		ldbDaoImpl.query();

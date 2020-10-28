@@ -71,6 +71,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		//  这只是其中一点，但是这个AnnotatedBeanDefinitionReader
 		//  最重要的一点是如果非spring 开发人员要拓展spring的时候，
 		//  可以调用AnnotatedBeanDefinitionReader进行spring bean的注入
+
+		// lookupRes 此外这句代码也初始化了spring开天辟地的5个BeanDefinition（在实例化AnnotatedBeanDefinitionReade 之前实例化了）
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 
 		// lookupRes 给外部程序员使用的，用来实现包扫描的方法，这边对它进行了初始化，spring 内部重新实例化了一个
@@ -94,7 +96,10 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * e.g. {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... annotatedClasses) {
+		// lookupres 这个list会初始化一个DefaultListableBeanFactory的beanFactory，
+		//  但是很隐秘，在父类GenericApplicationContext的构造方法里面new的
 		this();
+		// lookupres 把启动类注册到 this.beanDefinitionMap
 		register(annotatedClasses);
 		refresh();
 	}

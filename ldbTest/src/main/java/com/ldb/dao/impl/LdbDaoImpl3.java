@@ -17,7 +17,7 @@ import org.springframework.context.ApplicationContext;
  * @Version: 1.0
  */
 //@Repository
-@LdbScan
+//@LdbScan
 public class LdbDaoImpl3{
 	LdbDao ldbDaoImpl;
 
