@@ -61,6 +61,8 @@ public abstract class BeanFactoryUtils {
 
 
 	/**
+	 *
+	 * lookupres 判断是不是factoryBean
 	 * Return whether the given name is a factory dereference
 	 * (beginning with the factory dereference prefix).
 	 * @param name the name of the bean
@@ -80,11 +82,13 @@ public abstract class BeanFactoryUtils {
 	 */
 	public static String transformedBeanName(String name) {
 		Assert.notNull(name, "'name' must not be null");
+		// lookupres 如果不是FactoryBean的名称的话，直接返回
 		if (!name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX)) {
 			return name;
 		}
 		return transformedBeanNameCache.computeIfAbsent(name, beanName -> {
 			do {
+				// lookupres 如果是FactoryBean的名称的话，就把前面的“&”去掉
 				beanName = beanName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
 			}
 			while (beanName.startsWith(BeanFactory.FACTORY_BEAN_PREFIX));

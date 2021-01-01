@@ -196,6 +196,8 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	@Override
 	public void afterPropertiesSet() {
+		// lookupres 初始化 HandlerMethods 实际上就是去找哪些bean 是mvc需要的，
+		//  后面查找对应的HandlerMapping也是在这个方法下面执行的
 		initHandlerMethods();
 	}
 
@@ -206,11 +208,14 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @see #handlerMethodsInitialized
 	 */
 	protected void initHandlerMethods() {
+		// lookupres 获取所有的bean
 		for (String beanName : getCandidateBeanNames()) {
 			if (!beanName.startsWith(SCOPED_TARGET_NAME_PREFIX)) {
+				// lookupres 真正在找handlerMapping 的方法
 				processCandidateBean(beanName);
 			}
 		}
+		// lookupres 单纯的输出了一句日志没啥了
 		handlerMethodsInitialized(getHandlerMethods());
 	}
 
@@ -236,6 +241,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @since 5.1
 	 * @see #isHandler
 	 * @see #detectHandlerMethods
+	 * lookupres 处理候选的 HandlerMapping
 	 */
 	protected void processCandidateBean(String beanName) {
 		Class<?> beanType = null;
@@ -249,6 +255,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			}
 		}
 		if (beanType != null && isHandler(beanType)) {
+			// lookupres 查找对应的handlerMapping的方法
 			detectHandlerMethods(beanName);
 		}
 	}
@@ -264,9 +271,11 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 		if (handlerType != null) {
 			Class<?> userType = ClassUtils.getUserClass(handlerType);
+			// lookupres 通过对应的handlerMapping 找到对应的 handler方法
 			Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
 					(MethodIntrospector.MetadataLookup<T>) method -> {
 						try {
+							// lookupres getMappingForMethod 就是用来获取对应的RequestMappingInfo的信息的
 							return getMappingForMethod(method, userType);
 						}
 						catch (Throwable ex) {
@@ -279,6 +288,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			}
 			methods.forEach((method, mapping) -> {
 				Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
+				// lookupres 把对应的 controller注册到 mappingRegistry 中
 				registerHandlerMethod(handler, invocableMethod, mapping);
 			});
 		}

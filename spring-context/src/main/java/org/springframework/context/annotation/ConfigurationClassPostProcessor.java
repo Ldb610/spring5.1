@@ -230,7 +230,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 		this.registriesPostProcessed.add(registryId);
 
-		// lookupres 真正做起了扫描
+		// lookupres 真正做起了扫描，扫描完成后有了beanDefinition
 		processConfigBeanDefinitions(registry);
 	}
 
@@ -347,6 +347,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 						registry, this.sourceExtractor, this.resourceLoader, this.environment,
 						this.importBeanNameGenerator, parser.getImportRegistry());
 			}
+			// lookupres 加载beanDefinition
 			this.reader.loadBeanDefinitions(configClasses);
 			alreadyParsed.addAll(configClasses);
 

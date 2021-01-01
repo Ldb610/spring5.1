@@ -195,6 +195,7 @@ class ConfigurationClassBeanDefinitionReader {
 
 		// Register aliases even when overridden
 		for (String alias : names) {
+			// lookupres 获取bean 的别名。然后保存到aliasMap里面
 			this.registry.registerAlias(beanName, alias);
 		}
 

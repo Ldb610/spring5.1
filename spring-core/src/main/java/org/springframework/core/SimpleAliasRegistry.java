@@ -207,15 +207,18 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	}
 
 	/**
+	 * lookupres  规范名称
 	 * Determine the raw name, resolving aliases to canonical names.
 	 * @param name the user-specified name
 	 * @return the transformed name
 	 */
 	public String canonicalName(String name) {
+		// 规范名称
 		String canonicalName = name;
 		// Handle aliasing...
 		String resolvedName;
 		do {
+			//lookupres 如果传进来的是别名，那么就用别名获取到实际的bean的名称
 			resolvedName = this.aliasMap.get(canonicalName);
 			if (resolvedName != null) {
 				canonicalName = resolvedName;

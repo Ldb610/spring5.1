@@ -438,6 +438,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 						MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
 						// lookupres 判断当前这个文件符不符合我们的规则
 						if (isCandidateComponent(metadataReader)) {
+							// lookupres beanDefinition 在这边的生成的
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 							sbd.setResource(resource);
 							sbd.setSource(resource);

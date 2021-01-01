@@ -77,6 +77,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/** Cache of early singleton objects: bean name to bean instance. */
+	// lookupres 表示Bean的生命周期还没走完就把这个Bean放入了earlySingletonObjects
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
 	/** Set of registered singletons, containing the bean names in registration order. */
@@ -165,6 +166,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * lookupres 这个方法涉及到springbean的三级缓存，singletonObjects、earlySingletonObjects、singletonFactories。
+	 * 	singletonObjects：这个是走完完整的生命周期的bean 存放的地方
+	 * 	earlySingletonObjects：这个存放的是还没完整的走完bean生命周期的的bean的地方
+	 * 	singletonFactories：中缓存的是ObjectFactory，表示对象工厂，用来创建某个对象的。
 	 * Return the (raw) singleton object registered under the given name.
 	 * <p>Checks already instantiated singletons and also allows for an early
 	 * reference to a currently created singleton (resolving a circular reference).
@@ -181,7 +186,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			//  那么就可能会出现A线程正在实例化这个bean，但是还没实例化完成，
 			//  但是B线程这个时候也过来获取这个bean了，那么这时候两个线程都会产生一个bean。这样就会导致系统出问题
 			synchronized (this.singletonObjects) {
+				// lookupres 从未完整走完bean的生命周期的缓存池获取bean的信息
 				singletonObject = this.earlySingletonObjects.get(beanName);
+				// lookupres allowEarlyReference参数的含义是Spring是否允许循环依赖
+				//  如果不在earlySingletonObjects里面，且它允许循环依赖的发生，
+				//  那么他会从singletonFactories缓存池中去获取用来创建对象的对象工厂
 				if (singletonObject == null && allowEarlyReference) {
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {

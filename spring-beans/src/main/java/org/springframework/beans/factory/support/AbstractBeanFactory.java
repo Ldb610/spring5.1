@@ -194,8 +194,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	// Implementation of BeanFactory interface
 	//---------------------------------------------------------------------
 
+	/**
+	 * lookupres 获取bean
+	 * @param name the name of the bean to retrieve
+	 * @return
+	 * @throws BeansException
+	 */
 	@Override
 	public Object getBean(String name) throws BeansException {
+		// lookupres 开始获取bean
 		return doGetBean(name, null, null, false);
 	}
 
@@ -239,6 +246,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
 			@Nullable final Object[] args, boolean typeCheckOnly) throws BeansException {
 
+		// lookupres 把传进来的bean的名称换成实际上bean的名称，
+		//  例如有可能传进来的是 FactoryBean的名称，那么这时候的名称是“&+beanName”的形式的，
+		//  如果是这个形式的话，这个方法会把前面的“&”去掉
 		final String beanName = transformedBeanName(name);
 		Object bean;
 
@@ -247,6 +257,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
+				// lookupres 判断单例bean 是否正在被创建
 				if (isSingletonCurrentlyInCreation(beanName)) {
 					logger.trace("Returning eagerly cached instance of singleton bean '" + beanName +
 							"' that is not fully initialized yet - a consequence of a circular reference");
@@ -255,6 +266,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
 				}
 			}
+			//  lookupres 获取bean实例
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 
@@ -289,6 +301,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 			}
 
+			// lookupres 是否只检测类型，只有是factoryBean在获取类型的时候才是为true。
+			//  因为获取类型并不需要创建bean
 			if (!typeCheckOnly) {
 				markBeanAsCreated(beanName);
 			}
@@ -1217,6 +1231,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected RootBeanDefinition getMergedLocalBeanDefinition(String beanName) throws BeansException {
 		// Quick check on the concurrent map first, with minimal locking.
+		// lookupres 获取的RootBeanDefinition 是干嘛的
 		RootBeanDefinition mbd = this.mergedBeanDefinitions.get(beanName);
 		if (mbd != null) {
 			return mbd;
@@ -1537,6 +1552,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 * @see #getBean(String)
 	 */
+	// lookupres 获取FactoryBean的类型
 	@Nullable
 	protected Class<?> getTypeForFactoryBean(String beanName, RootBeanDefinition mbd) {
 		if (!mbd.isSingleton()) {
@@ -1544,6 +1560,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 		try {
 			FactoryBean<?> factoryBean = doGetBean(FACTORY_BEAN_PREFIX + beanName, FactoryBean.class, null, true);
+			// lookupres 获取FactoryBean的类型
 			return getTypeForFactoryBean(factoryBean);
 		}
 		catch (BeanCreationException ex) {
@@ -1646,6 +1663,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
 
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
+		// lookupres 判断是不是factoryBean，如果是 factoryBean 的话是以&开头的
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;
